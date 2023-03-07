@@ -126,6 +126,10 @@ set(CMAKE_CXX_STANDARD 20)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
 #set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -O3)
+set( BOOST_ROOT "/home/aloch/Downloads/boost_1_81_0" CACHE PATH "Boost library path" )
+set(Boost_INCLUDE_DIR /home/aloch/Downloads/boost_1_81_0/include) 
+set(Boost_LIBRARY_DIR /home/aloch/Downloads/boost_1_81_0/lib)
+
 find_package( Boost COMPONENTS program_options thread REQUIRED )
 
 find_package(OpenCV 4 REQUIRED)
@@ -144,6 +148,7 @@ find_package(catkin REQUIRED COMPONENTS
         rospy
         std_msgs
         message_generation
+        tf
         )
 
 add_executable(active_markers main.cpp
@@ -168,6 +173,7 @@ target_link_libraries( active_markers
                         MetavisionSDK::ui
                         Boost::program_options
                         Boost::thread
+                        # ${Boost_LIBRARY_DIR}
                         ${catkin_LIBRARIES}
                          )
 

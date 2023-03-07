@@ -200,7 +200,12 @@ void Marker::stopTracking(){
 
 void Marker::track() {
 
-    cv::solvePnP(objectpoints_3d, detected_initial_points, cam_obj->camera_matrix_cv, cam_obj->dist_coeffs, r_vec, t_vec, false);
+    bool status = cv::solvePnP(objectpoints_3d, detected_initial_points, cam_obj->camera_matrix_cv, cam_obj->dist_coeffs, r_vec, t_vec, false);
+
+    if (!status){
+        stopTracking();
+        markers_manager_ptr->deregisterMarker(this);
+    }
 
     std::vector<cv::Point2d> projected;
     cv::projectPoints(objectpoints_3d, r_vec, t_vec, cam_obj->camera_matrix_cv, cam_obj->dist_coeffs, projected);
@@ -319,7 +324,7 @@ void Marker::solvePnP() {
         distances.push_back(distance);
     }
 
-    cv::solvePnP(objectpoints_3d,
+    bool status = cv::solvePnP(objectpoints_3d,
                  blob_centers,
                  cam_obj->camera_matrix_cv,
                  cam_obj->dist_coeffs,
@@ -327,6 +332,12 @@ void Marker::solvePnP() {
                  t_vec,
                  true,
                  solve_method);
+
+    if (!status) {
+        tracking_lost = true;
+        return;
+    }
+
     cv::Mat projected_tmp;
     cv::projectPoints(objectpoints_3d, r_vec, t_vec, cam_obj->camera_matrix_cv, cam_obj->dist_coeffs, projected_tmp);
     projected_tmp.convertTo(projected_objectpoints, cv::Mat(projected_objectpoints).type());
@@ -341,17 +352,7 @@ void Marker::solvePnP() {
     for (size_t i = 0; i < blob_centers.size() ; i++) {
         error_sum += cv::norm(projected_objectpoints[i] - blob_centers[i]);
         dist_sum += (3*distances[i]);
-        // if (cv::norm(projected_objectpoints[i] - blob_centers[i]) > distances[i]) {
-        //     std::cout << "tracking lost" << std::endl;
-        //     std::cout << cv::norm(projected_objectpoints[i] - blob_centers[i]) << std::endl;
-        //     tracking_lost = true;
-        //     std::cout << r_vec << std::endl;
-        //     std::cout << t_vec << std::endl;
-        //     break;
-        // }
-        // if (tracking_lost.load()) {
-        //     // break;
-        // }
+
     }
     if(error_sum > dist_sum){
         std::cout << "tracking lost" << std::endl;

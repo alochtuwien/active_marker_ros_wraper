@@ -14,12 +14,14 @@
 #include <atomic>
 class Logger {
 public:
-    Logger();
+    Logger(bool csv_logging, std::string ros_tf_parent_name);
     void start();
     std::shared_ptr<OutputQueue> output_queue;
     std::shared_ptr<std::unordered_map<int, std::shared_ptr<OutputEntry>>> getCurrentStatus();
 
 private:
+    bool csv_logging_enabled;
+    std::string ros_tf_parent;
 
     csvfile *csv;
     [[noreturn]] void loggerLoop();

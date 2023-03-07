@@ -11,6 +11,9 @@ Utils::Options::Parser::Parser(int argc, char **argv){
     std::string recording_filepath;
     std::string biases_filepath;
     std::string markers_config_filepath;
+    std::string ros_parent_name;
+
+    int recording_time;
 
     po::options_description general_opt("General Options");
     general_opt.add_options()
@@ -18,7 +21,11 @@ Utils::Options::Parser::Parser(int argc, char **argv){
             ("input_file,i", po::value<std::string>(&recording_filepath), "Recording file (raw)")
             ("camera_config_file,c", po::value<std::string>(&camera_config_filepath)->required(), "config file (yaml)")
             ("biases_file,b", po::value<std::string>(&biases_filepath), "Biases file (bias)")
-            ("markers_config_filepath,m", po::value<std::string>(&markers_config_filepath)->required(), "Description file for markers");
+            ("markers_config_filepath,m", po::value<std::string>(&markers_config_filepath)->required(), "Description file for markers")
+            ("ros_parent,r", po::value<std::string>(&ros_parent_name)->required(), "Name of the parent TF")
+            ("csv_enable,csv", po::bool_switch()->default_value(false), "Enables csv logging")
+            ("synchro,sync", po::bool_switch()->default_value(false), "Enables synchronisation")
+            ("recording_time,t", po::value<int>(&recording_time), "Synchronisation time (ms)");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, general_opt), vm);
@@ -30,6 +37,25 @@ Utils::Options::Parser::Parser(int argc, char **argv){
 
     //Camera config
     CameraSetup cam_config;
+    if (vm.count("ros_parent")){
+        current_setup.parent_tf_name = vm["ros_parent"].as<std::string>();
+        std::cout << "ROS TF enabled - parent TF name: " << current_setup.parent_tf_name << std::endl;
+    }
+    
+    if (vm.count("recording_time")){
+        current_setup.recording_time = vm["recording_time"].as<int>();
+    }
+
+    current_setup.synchro = vm.count("synchro");
+    if(current_setup.synchro){
+        std::cout << "Synchronization enabled" << std::endl;
+    }
+
+    current_setup.csv_logging_enabled = vm.count("csv_enable");
+    if(current_setup.csv_logging_enabled){
+        std::cout << "CSV logging enabled!" << std::endl;
+    }
+
 
     if (vm.count("input_file")){
         cam_config.is_recording = true;

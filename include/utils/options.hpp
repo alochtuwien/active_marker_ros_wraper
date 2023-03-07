@@ -37,6 +37,10 @@ namespace Utils::Options {
 
     class Setup {
     public:
+        bool synchro = false;
+        int recording_time = 0;
+        bool csv_logging_enabled = false;
+        std::string parent_tf_name;
         CameraSetup cam_config;
         MarkersSetup marker_config;
 

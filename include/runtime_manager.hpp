@@ -12,12 +12,12 @@
 #include "camera.hpp"
 #include <thread>
 #include "logger.hpp"
+#include "utils/options.hpp"
 
 class RuntimeManager {
 public:
-    RuntimeManager(MarkersManager &markers_manager, Camera *cam);
+    RuntimeManager(MarkersManager &markers_manager, Camera *cam, Utils::Options::Setup *setup);
     Buffers buffers;
-
     MarkersManager* markers;
 
     DetectionAlgorithm* detector;
