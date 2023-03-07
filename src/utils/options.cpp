@@ -46,12 +46,12 @@ Utils::Options::Parser::Parser(int argc, char **argv){
         current_setup.recording_time = vm["recording_time"].as<int>();
     }
 
-    current_setup.synchro = vm.count("synchro");
+    current_setup.synchro = vm["synchro"].as<bool>();
     if(current_setup.synchro){
         std::cout << "Synchronization enabled" << std::endl;
     }
 
-    current_setup.csv_logging_enabled = vm.count("csv_enable");
+    current_setup.csv_logging_enabled = vm["csv_enable"].as<bool>();
     if(current_setup.csv_logging_enabled){
         std::cout << "CSV logging enabled!" << std::endl;
     }
